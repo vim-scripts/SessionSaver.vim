@@ -7,7 +7,7 @@
 "map <C-h>ss call SaveSession()<CR>
 
 "Set this variable to wherever you want to save your sessions
-let g:sessionDir="$HOME/.vim/sessions"
+let g:sessionDir=$HOME."/.vim/sessions"
 
 "I have a slightly more complicated version of the following function in my .bashrc
 "So that I can directly load a session without specifying the full path:
@@ -18,14 +18,30 @@ let g:sessionDir="$HOME/.vim/sessions"
 
 "No need to modify below this line
 
+"Check if ~/.vim and ~/.vim/sessions exist: if they don't, create them
+function! SanityCheckDirs()
+    "Create .vim directory if needed
+    if (! filewritable($HOME."/.vim"))
+        call mkdir($HOME."/.vim")
+    endif
+    "Create session dir if needed
+    if (!filewritable(g:sessionDir))
+        call mkdir(g:sessionDir)
+    endif
+endfunction
+
 "List all files in session directory
 function! ListSessions()
-    
+
     let outStr = "Session files in session directory ".g:sessionDir.":\n"
-    
+
     for sessFileName in split(glob(g:sessionDir."/*"),'\n')
 
-        let pathSplit = split(sessFileName, '/')
+        if (has('win32'))
+            let pathSplit = split(sessFileName, '\')
+        else
+            let pathSplit = split(sessFileName, '/')
+        endif
         let outStr = outStr.pathSplit[len(pathSplit) - 1]."\n"
         "echo pathSplit[len(pathSplit) - 1]
 
@@ -92,14 +108,27 @@ function! LoadSession()
 
     let loadSessionName = GetSessNameFromUser()
     if (loadSessionName != "x")
-        echo "Loading session ".loadSessionName
-        let cmd="source ".g:sessionDir."/".loadSessionName
-        exec cmd
+        let sessionFile=g:sessionDir."/".loadSessionName
+
+        if (filewritable(sessionFile))
+
+            echo "Loading session ".loadSessionName
+            let cmd="source ".sessionFile
+            exec cmd
+
+        else
+
+            echo "Session File ".sessionFile." does not exist, nothing to load"
+
+        endif
+
     endif
 endfunction
 
 "called during startup of vim to allow user choice of loading session
 function AutoLoadSession()
+
+    call SanityCheckDirs()
 
     if ((argc() == 0) && (v:this_session == ""))
         call LoadSession()
