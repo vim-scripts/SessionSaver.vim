@@ -1,0 +1,19 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=3657
+
+This plugin automatically saves the current session vim is running with on exit (e.g. by doing :qa)
+
+** this was created for my own session editing purposes.. at the time of writing, I looked up vim help and based my functions on tips from there.  However, while trying to add functionality to it, I also found:
+http://vim.wikia.com/wiki/Go_away_and_come_back -- which seems to more or less do what my plugin does (and it was written in 2006!)
+
+If no session is currently loaded, on exit, it prompts the user on whether to save the session or not.  'x' cancels, while <enter> saves the current session as 'default'.  If a session name is specified instead, the current session is saved as that.  
+
+Sessions are saved by default to ~/.vim/sessions, but this can easily be changed according to your preference.
+
+Starting vim without arguments causes it to prompt you to choose a session: x continues with no session, ? lists existing sessions, <enter> loads the default session.
+
+More details (not necessary unless you are feeling more adventurous):
+
+To start vim with an existing session, you would do something like:
+vi -S $HOME/.vim/sessions/sessionName
+
+*** However, I find that too cumbersome to type, and have aliases set up in my .bashrc... have included basic examples in the plugin file itself.
